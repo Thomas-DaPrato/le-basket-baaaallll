@@ -1,14 +1,9 @@
 import pygame
-from pygame.locals import*
-import math
+import test2
+import os
 
-x = int(input())
-t = 5
-p = x % t
+pygame.init()
 
-if p == 0:
-    print(p)
-    print('gagner')
-else:
-    print(p)
-    print('perdu')
+screen = pygame.display.set_mode((700, 500))
+
+print (test2.img)

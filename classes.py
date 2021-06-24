@@ -4,22 +4,20 @@ import os
 
 
 class Joueur:
-    def __init__(self, x, y, textureDroite, textureGauche, gravite, touches, nom, rect):
+    def __init__(self, x, y, textureDroite, textureGauche, gravite, touches, nom):
         self.x = x
         self.y = y
-        self.rect = rect
-        self.texture = textureDroite
+        self.hitbox = textureDroite.get_rect()
+        self.textureCourante = textureDroite
         self.textureDroite = textureDroite
         self.textureGauche = textureGauche
-        self.vy = 0
-        self.vx = 0
         self.gravite = gravite
         self.touches = touches
         self.nom = nom
 
     def render(self, surface):
 
-        surface.blit(self.texture, (self.rect.x, self.rect.y))
+        surface.blit(self.textureCourante, (self.rect.x, self.rect.y))
         surface.blit(self.nom, ((self.rect.x), (self.rect.y - 25)))
 
     def update(self, events, liste_key):
@@ -27,12 +25,12 @@ class Joueur:
         if liste_key[self.touches["gauche"]]:
             self.x -= 3
             self.rect.x = self.x
-            self.texture = self.textureGauche
+            self.textureCourante = self.textureGauche
 
         if liste_key[self.touches["droite"]]:
             self.x += 3
             self.rect.x = self.x
-            self.texture = self.textureDroite
+            self.textureCourante = self.textureDroite
 
         if liste_key[self.touches["saut"]] and self.y == 613:
             self.vy -= 20
