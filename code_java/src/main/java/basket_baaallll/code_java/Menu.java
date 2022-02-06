@@ -1,5 +1,6 @@
 package basket_baaallll.code_java;
 
+import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -8,11 +9,14 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 
-public class Menu {
-    public Menu(Group root, Stage stage, Scene scene) {
+public class Menu extends Application {
+    @Override
+    public void start(Stage menuStage){
+        Group menuRoot = new Group();
+        Scene menuScene = new Scene(menuRoot, 700,500);
+        menuStage.setScene(menuScene);
+
         Button play = new Button("Play");
         play.setLayoutX(350);
         play.setLayoutY(295);
@@ -21,26 +25,23 @@ public class Menu {
         help.setLayoutX(350);
         help.setLayoutY(395);
 
+        menuRoot.getChildren().addAll(play,help);
+
         play.setOnAction(actionEvent -> {
-            root.getChildren().removeAll(play,help);
-            stage.setWidth(1000);
-            stage.setHeight(1000);
+            menuStage.hide();
             try {
-                Play Gameplay = new Play(root,scene);
+                Game.start();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-
         });
 
-        help.setOnAction(actionEvent -> {
-            try {
-                java.awt.Desktop.getDesktop().open(new File("src/main/resources/html/ggggg.html"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+        menuStage.show();
 
-        root.getChildren().addAll(play,help);
+
+    }
+
+    public static void main(String[] args) {
+        launch();
     }
 }

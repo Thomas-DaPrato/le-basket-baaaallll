@@ -13,6 +13,7 @@ import java.util.HashMap;
 public class Player {
     private int x;
     private int y;
+    private boolean hasJump = false;
 
     private HashMap<String, KeyCode> control = new HashMap<>();
 
@@ -65,15 +66,30 @@ public class Player {
     public void move(KeyCode key){
         if (control.get("left") == key){
             x -= 3;
+            setActualTexture(leftTexture);
         }
         if (control.get("right") == key){
             x += 3;
+            setActualTexture(rightTexture);
         }
         if(control.get("jump") == key){
-            y -= 20;
+            if (!hasJump) {
+                y -= 100;
+                hasJump = true;
+            }
         }
         if(control.get("power") == key){
             usePower();
+        }
+        update();
+    }
+
+    public void gravity(){
+        if (y < 700 - getRightTexture().getHeight()) {
+            y += 3;
+        }
+        else {
+            hasJump = false;
         }
         update();
     }
