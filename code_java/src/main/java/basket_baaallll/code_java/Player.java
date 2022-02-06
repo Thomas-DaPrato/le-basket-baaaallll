@@ -5,6 +5,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.shape.Rectangle;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -18,10 +19,15 @@ public class Player {
     private HashMap<String, KeyCode> control = new HashMap<>();
 
     private Label name;
+    private int score = 0;
+
+    private int timePower = 10;
+    private boolean hasPower = false;
 
     private ImageView actualTexture = new ImageView();
     private Image rightTexture;
     private Image leftTexture;
+    private Rectangle hitbox;
 
     public Player(int x, int y, String name, String pathRightTexture, String pathLeftTexture, Group root) throws FileNotFoundException {
         this.x = x;
@@ -53,6 +59,15 @@ public class Player {
 
     public void setActualTexture(Image actualTexture) {
         this.actualTexture.setImage(actualTexture);
+        this.hitbox = new Rectangle(x,y,actualTexture.getWidth(),actualTexture.getHeight());
+    }
+
+    public Rectangle getHitbox() {
+        return hitbox;
+    }
+
+    public ImageView getActualTexture() {
+        return actualTexture;
     }
 
     public Image getRightTexture() {
@@ -61,6 +76,10 @@ public class Player {
 
     public Image getLeftTexture() {
         return leftTexture;
+    }
+
+    public int getScore() {
+        return score;
     }
 
     public void move(KeyCode key){
@@ -99,7 +118,7 @@ public class Player {
 
 
     public void usePower(){
-        //TO DO
+        System.out.println("use power");
     }
 
     public void update(){
@@ -107,5 +126,15 @@ public class Player {
         name.setLayoutY(y - 25);
         actualTexture.setX(x);
         actualTexture.setY(y);
+        hitbox.setX(x);
+        hitbox.setY(y);
+    }
+
+    public void incrementScore(){
+        score +=1;
+    }
+
+    public void decrementTimePower(){
+        timePower -= 1;
     }
 }
