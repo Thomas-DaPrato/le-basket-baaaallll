@@ -82,6 +82,22 @@ public class Player {
         return score;
     }
 
+    public int getTimePower() {
+        return timePower;
+    }
+
+    public boolean isHasPower() {
+        return hasPower;
+    }
+
+    public void setHasPower(boolean hasPower) {
+        this.hasPower = hasPower;
+    }
+
+    public void setTimePower(int timePower) {
+        this.timePower = timePower;
+    }
+
     public void move(KeyCode key){
         if (control.get("left") == key){
             if (x > 0)

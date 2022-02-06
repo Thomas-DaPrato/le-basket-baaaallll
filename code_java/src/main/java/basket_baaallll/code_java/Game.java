@@ -48,12 +48,12 @@ public class Game {
         displayScore.setFill(Color.BLACK);
 
         Label scoreJ1 = new Label("0");
-        scoreJ1.setLayoutX(300);
+        scoreJ1.setLayoutX(350);
         scoreJ1.setLayoutY(100);
         scoreJ1.setTextFill(Color.WHITE);
 
         Label scoreJ2 = new Label("0");
-        scoreJ2.setLayoutX(700);
+        scoreJ2.setLayoutX(650);
         scoreJ2.setLayoutY(100);
         scoreJ2.setTextFill(Color.WHITE);
 
@@ -66,8 +66,28 @@ public class Game {
         chrono.setLayoutY(100);
         chrono.setTextFill(Color.WHITE);
 
+        //build display power
+        ImageView powerJ1 = new ImageView(new Image(new FileInputStream("src/main/resources/images/barrePouvoir.png")));
+        powerJ1.setX(175);
+        powerJ1.setY(100);
 
-        playingRoot.getChildren().addAll(background, displayScore, scoreJ1, scoreJ2, chrono);
+        Rectangle fullPowerJ1 = new Rectangle(175,100,150,30);
+        fullPowerJ1.setStroke(Color.ORANGE);
+        Rectangle hidePowerJ1 = new Rectangle(175,100,150,30);
+        hidePowerJ1.setFill(Color.BLACK);
+
+        ImageView powerJ2 = new ImageView(new Image(new FileInputStream("src/main/resources/images/barrePouvoir.png")));
+        powerJ2.setX(825);
+        powerJ2.setY(100);
+        powerJ2.setRotate(180);
+
+        Rectangle fullPowerJ2 = new Rectangle(825,100,150,30);
+        fullPowerJ1.setStroke(Color.ORANGE);
+        Rectangle hidePowerJ2 = new Rectangle(175,100,150,30);
+        hidePowerJ2.setFill(Color.BLACK);
+
+
+        playingRoot.getChildren().addAll(background, displayScore, scoreJ1, scoreJ2, chrono, powerJ1,powerJ2,hidePowerJ1,hidePowerJ2);
 
         Player j1 = new Player(100,500,"j1","src/main/resources/images/perso1d.png", "src/main/resources/images/perso1g.png",playingRoot);
         j1.setControl(KeyCode.Q, KeyCode.D, KeyCode.SPACE, KeyCode.SHIFT);
@@ -92,6 +112,25 @@ public class Game {
                     minute.addAndGet(-1);
                 }
                 chrono.setText(minute.get() + ":" + seconde.get());
+
+                if (!j1.isHasPower()){
+                    hidePowerJ1.setWidth(hidePowerJ1.getWidth() - 15);
+                    j1.decrementTimePower();
+                    if (j1.getTimePower() == 0)
+                        j1.setHasPower(true);
+                }
+                else
+                    playingRoot.getChildren().add(fullPowerJ1);
+
+                if (!j2.isHasPower()){
+                    hidePowerJ2.setWidth(hidePowerJ2.getWidth() - 15);
+                    j2.decrementTimePower();
+                    if (j2.getTimePower() == 0)
+                        j2.setHasPower(true);
+                }
+                else
+                    playingRoot.getChildren().add(fullPowerJ2);
+
             }
 
             for (KeyCode keyCode: activeKeys){
