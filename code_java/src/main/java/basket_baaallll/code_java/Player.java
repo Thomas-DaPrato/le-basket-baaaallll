@@ -18,29 +18,48 @@ public class Player {
 
     private Label name;
 
-    private ImageView texture;
+    private ImageView actualTexture = new ImageView();
+    private Image rightTexture;
+    private Image leftTexture;
 
-    public Player(int x, int y, String name, String pathTexture, Group root) throws FileNotFoundException {
+    public Player(int x, int y, String name, String pathRightTexture, String pathLeftTexture, Group root) throws FileNotFoundException {
         this.x = x;
         this.y = y;
+
         this.name = new Label(name);
         this.name.setLayoutX(x);
         this.name.setLayoutY(y -25);
-        this.texture = new ImageView(new Image(new FileInputStream(pathTexture)));
-        this.texture.setX(x);
-        this.texture.setY(y);
+
+        this.actualTexture.setX(x);
+        this.actualTexture.setY(y);
+        this.rightTexture = new Image(new FileInputStream(pathRightTexture));
+        this.leftTexture = new Image(new FileInputStream(pathLeftTexture));
+
         control.put("left",null);
         control.put("right",null);
         control.put("jump",null);
         control.put("power",null);
-        root.getChildren().addAll(texture,this.name);
+
+        root.getChildren().addAll(actualTexture,this.name);
     }
 
-    public void initControl(KeyCode keyLeft, KeyCode keyRight, KeyCode keyJump, KeyCode keyPower){
+    public void setControl(KeyCode keyLeft, KeyCode keyRight, KeyCode keyJump, KeyCode keyPower){
         control.replace("left",keyLeft);
         control.replace("right",keyRight);
         control.replace("jump",keyJump);
         control.replace("power",keyPower);
+    }
+
+    public void setActualTexture(Image actualTexture) {
+        this.actualTexture.setImage(actualTexture);
+    }
+
+    public Image getRightTexture() {
+        return rightTexture;
+    }
+
+    public Image getLeftTexture() {
+        return leftTexture;
     }
 
     public void move(KeyCode key){
@@ -59,6 +78,7 @@ public class Player {
         update();
     }
 
+
     public void usePower(){
         //TO DO
     }
@@ -66,7 +86,7 @@ public class Player {
     public void update(){
         name.setLayoutX(x);
         name.setLayoutY(y - 25);
-        texture.setX(x);
-        texture.setY(y);
+        actualTexture.setX(x);
+        actualTexture.setY(y);
     }
 }
