@@ -65,11 +65,13 @@ public class Player {
 
     public void move(KeyCode key){
         if (control.get("left") == key){
-            x -= 3;
+            if (x > 0)
+                x -= 3;
             setActualTexture(leftTexture);
         }
         if (control.get("right") == key){
-            x += 3;
+            if (x + actualTexture.getImage().getWidth() < 1000)
+                x += 3;
             setActualTexture(rightTexture);
         }
         if(control.get("jump") == key){
@@ -78,6 +80,7 @@ public class Player {
                 hasJump = true;
             }
         }
+
         if(control.get("power") == key){
             usePower();
         }
