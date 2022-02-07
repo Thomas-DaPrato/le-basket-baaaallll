@@ -73,17 +73,19 @@ public class Game {
 
         Rectangle fullPowerJ1 = new Rectangle(175,100,150,30);
         fullPowerJ1.setStroke(Color.ORANGE);
+        fullPowerJ1.setFill(Color.TRANSPARENT);
         Rectangle hidePowerJ1 = new Rectangle(175,100,150,30);
         hidePowerJ1.setFill(Color.BLACK);
 
         ImageView powerJ2 = new ImageView(new Image(new FileInputStream("src/main/resources/images/barrePouvoir.png")));
-        powerJ2.setX(825);
+        powerJ2.setX(675);
         powerJ2.setY(100);
         powerJ2.setRotate(180);
 
-        Rectangle fullPowerJ2 = new Rectangle(825,100,150,30);
-        fullPowerJ1.setStroke(Color.ORANGE);
-        Rectangle hidePowerJ2 = new Rectangle(175,100,150,30);
+        Rectangle fullPowerJ2 = new Rectangle(675,100,150,30);
+        fullPowerJ2.setStroke(Color.ORANGE);
+        fullPowerJ2.setFill(Color.TRANSPARENT);
+        Rectangle hidePowerJ2 = new Rectangle(675,100,150,30);
         hidePowerJ2.setFill(Color.BLACK);
 
 
@@ -116,21 +118,22 @@ public class Game {
                 if (!j1.isHasPower()){
                     hidePowerJ1.setWidth(hidePowerJ1.getWidth() - 15);
                     j1.decrementTimePower();
-                    if (j1.getTimePower() == 0)
+                    if (j1.getTimePower() == 0){
                         j1.setHasPower(true);
+                        playingRoot.getChildren().add(fullPowerJ1);
+                    }
                 }
-                else
-                    playingRoot.getChildren().add(fullPowerJ1);
+
 
                 if (!j2.isHasPower()){
                     hidePowerJ2.setWidth(hidePowerJ2.getWidth() - 15);
+                    hidePowerJ2.setX(hidePowerJ2.getX() + 15);
                     j2.decrementTimePower();
-                    if (j2.getTimePower() == 0)
+                    if (j2.getTimePower() == 0) {
                         j2.setHasPower(true);
+                        playingRoot.getChildren().add(fullPowerJ2);
+                    }
                 }
-                else
-                    playingRoot.getChildren().add(fullPowerJ2);
-
             }
 
             for (KeyCode keyCode: activeKeys){
