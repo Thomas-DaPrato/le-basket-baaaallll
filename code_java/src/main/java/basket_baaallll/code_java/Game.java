@@ -1,5 +1,11 @@
 package basket_baaallll.code_java;
 
+import basket_baaallll.code_java.Power.ball.FreezeBall;
+import basket_baaallll.code_java.Power.ball.TpBall;
+import basket_baaallll.code_java.Power.player.ChangeControlPlayer;
+import basket_baaallll.code_java.Power.player.FreezePlayer;
+import basket_baaallll.code_java.entities.Ball;
+import basket_baaallll.code_java.entities.Player;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -18,6 +24,7 @@ import javafx.util.Duration;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.EnumSet;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -67,6 +74,9 @@ public class Game {
         chrono.setTextFill(Color.WHITE);
 
         //build display power
+        ImageView imagePowerJ1 = new ImageView();
+        imagePowerJ1.setX(50);
+        imagePowerJ1.setY(50);
         ImageView powerJ1 = new ImageView(new Image(new FileInputStream("src/main/resources/images/barrePouvoir.png")));
         powerJ1.setX(175);
         powerJ1.setY(100);
@@ -77,6 +87,9 @@ public class Game {
         Rectangle hidePowerJ1 = new Rectangle(175,100,150,30);
         hidePowerJ1.setFill(Color.BLACK);
 
+        ImageView imagePowerJ2 = new ImageView();
+        imagePowerJ2.setX(850);
+        imagePowerJ2.setY(50);
         ImageView powerJ2 = new ImageView(new Image(new FileInputStream("src/main/resources/images/barrePouvoir.png")));
         powerJ2.setX(675);
         powerJ2.setY(100);
@@ -103,6 +116,8 @@ public class Game {
 
         final Set<KeyCode> activeKeys = EnumSet.noneOf(KeyCode.class);
 
+        Random power = new Random();
+
         //https://stackoverflow.com/questions/50337303/how-do-i-change-the-speed-of-an-animationtimer-in-javafx  --> timeline
         //https://www.developpez.net/forums/d1677438/java/interfaces-graphiques-java/javafx/setonkeypressed-multiple-touches/  --> multiple key pressed
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(10), actionEvent -> {
@@ -116,29 +131,48 @@ public class Game {
                 chrono.setText(minute.get() + ":" + seconde.get());
 
                 if (!j1.isHasPower()){
+                    playingRoot.getChildren().removeAll(fullPowerJ1,imagePowerJ1);
                     hidePowerJ1.setWidth(hidePowerJ1.getWidth() - 15);
                     j1.decrementTimePower();
                     if (j1.getTimePower() == 0){
                         j1.setHasPower(true);
-                        playingRoot.getChildren().add(fullPowerJ1);
+                        try {
+                            choosePower(power.nextInt(4),j1,ball,885,350,j2,imagePowerJ1);
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                        playingRoot.getChildren().addAll(fullPowerJ1,imagePowerJ1);
                     }
                 }
 
 
                 if (!j2.isHasPower()){
+                    playingRoot.getChildren().removeAll(fullPowerJ2,imagePowerJ2);
                     hidePowerJ2.setWidth(hidePowerJ2.getWidth() - 15);
                     hidePowerJ2.setX(hidePowerJ2.getX() + 15);
                     j2.decrementTimePower();
                     if (j2.getTimePower() == 0) {
                         j2.setHasPower(true);
-                        playingRoot.getChildren().add(fullPowerJ2);
+                        try {
+                            choosePower(power.nextInt(4),j2,ball,30,350,j1,imagePowerJ2);
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                        playingRoot.getChildren().addAll(fullPowerJ2,imagePowerJ2);
                     }
                 }
             }
 
             for (KeyCode keyCode: activeKeys){
                 j1.move(keyCode);
+                if (j1.isHasPower() && j1.getControl().get("power") == keyCode){
+                    hidePowerJ1.setWidth(150);
+                }
                 j2.move(keyCode);
+                if (j2.isHasPower() && j2.getControl().get("power") == keyCode){
+                    hidePowerJ2.setWidth(150);
+                    hidePowerJ2.setX(625);
+                }
             }
 
             j1.gravity();
@@ -156,13 +190,15 @@ public class Game {
             if (ball.checkBasket(leftBasket)) {
                     j2.incrementScore();
                     scoreJ2.setText(String.valueOf(j2.getScore()));
-                    ball.reset();
-                }
+                    reset(ball, j1, j2);
+                    playingRoot.getChildren().removeAll(imagePowerJ1,imagePowerJ2);
+            }
 
             if (ball.checkBasket(rightBasket)){
                 j1.incrementScore();
                 scoreJ1.setText(String.valueOf(j1.getScore()));
-                ball.reset();
+                reset(ball, j1, j2);
+                playingRoot.getChildren().removeAll(imagePowerJ1,imagePowerJ2);
             }
 
             msToS.addAndGet(-10);
@@ -182,5 +218,35 @@ public class Game {
         });
 
         playingStage.show();
+    }
+
+    private static void reset(Ball ball, Player j1, Player j2) {
+        ball.reset();
+        j1.reset(100,500);
+        j2.reset(900,500);
+        j1.setActualTexture(j1.getRightTexture());
+        j2.setActualTexture(j2.getLeftTexture());
+    }
+
+    private static void choosePower(int number, Player player, Ball ball, int x, int y, Player affectPlayer, ImageView imagePower) throws FileNotFoundException {
+        System.out.println(number);
+        switch (number%4){
+            case 0 -> {
+                player.setPower(new FreezeBall(ball));
+                imagePower.setImage(new Image(new FileInputStream("src/main/resources/images/freeze_ball.png")));
+            }
+            case 1 -> {
+                player.setPower(new TpBall(ball,x,y));
+                imagePower.setImage(new Image(new FileInputStream("src/main/resources/images/tp_ball.png")));
+            }
+            case 2 -> {
+                player.setPower(new FreezePlayer(affectPlayer));
+                imagePower.setImage(new Image(new FileInputStream("src/main/resources/images/freeze_joueur.png")));
+            }
+            case 3 -> {
+                player.setPower(new ChangeControlPlayer(affectPlayer));
+                imagePower.setImage(new Image(new FileInputStream("src/main/resources/images/inverse_commande.png")));
+            }
+        }
     }
 }

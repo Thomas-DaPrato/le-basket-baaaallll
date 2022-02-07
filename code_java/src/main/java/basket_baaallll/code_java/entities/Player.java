@@ -1,5 +1,7 @@
-package basket_baaallll.code_java;
+package basket_baaallll.code_java.entities;
 
+import basket_baaallll.code_java.Power.Power;
+import basket_baaallll.code_java.entities.Entities;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -11,10 +13,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 
-public class Player {
+public class Player implements Entities {
     private int x;
     private int y;
     private boolean hasJump = false;
+    private Power power;
 
     private HashMap<String, KeyCode> control = new HashMap<>();
 
@@ -57,6 +60,10 @@ public class Player {
         control.replace("power",keyPower);
     }
 
+    public HashMap<String, KeyCode> getControl() {
+        return control;
+    }
+
     public void setActualTexture(Image actualTexture) {
         this.actualTexture.setImage(actualTexture);
         this.hitbox = new Rectangle(x,y,actualTexture.getWidth(),actualTexture.getHeight());
@@ -92,6 +99,10 @@ public class Player {
 
     public void setHasPower(boolean hasPower) {
         this.hasPower = hasPower;
+    }
+
+    public void setPower(Power power) {
+        this.power = power;
     }
 
     public void setTimePower(int timePower) {
@@ -134,7 +145,12 @@ public class Player {
 
 
     public void usePower(){
-        System.out.println("use power");
+        if (hasPower){
+            hasPower = false;
+            timePower = 10;
+            power.use();
+        }
+
     }
 
     public void update(){
@@ -152,5 +168,13 @@ public class Player {
 
     public void decrementTimePower(){
         timePower -= 1;
+    }
+
+    public void reset(int x, int y){
+        this.x = x;
+        this.y = y;
+        hasPower = false;
+        hasJump = false;
+        power = null;
     }
 }

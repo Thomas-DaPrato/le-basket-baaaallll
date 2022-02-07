@@ -1,6 +1,6 @@
-package basket_baaallll.code_java;
+package basket_baaallll.code_java.entities;
 
-import javafx.geometry.Rectangle2D;
+import basket_baaallll.code_java.entities.Entities;
 import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -9,7 +9,7 @@ import javafx.scene.shape.Rectangle;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
-public class Ball {
+public class Ball implements Entities {
     private int x;
     private int y;
 
@@ -60,6 +60,22 @@ public class Ball {
 
     public void setyDirection(int yDirection) {
         this.yDirection = yDirection;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
+
+    public int getSpeed() {
+        return speed;
     }
 
     public void checkCollision(Rectangle hitbox){
