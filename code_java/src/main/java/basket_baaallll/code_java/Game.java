@@ -26,10 +26,11 @@ import java.io.FileNotFoundException;
 import java.util.EnumSet;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Game {
-    public static void start() throws FileNotFoundException {
+    public static void start(String nameJ1, String nameJ2) throws FileNotFoundException {
 
         Stage playingStage = new Stage();
 
@@ -68,7 +69,7 @@ public class Game {
         AtomicInteger seconde = new AtomicInteger(0);
         AtomicInteger msToS = new AtomicInteger(0);
 
-        Label chrono = new Label(minute.get() + ":" + seconde.get());
+        Label chrono = new Label(minute.get() + ":" + 0 + seconde.get());
         chrono.setLayoutX(450);
         chrono.setLayoutY(100);
         chrono.setTextFill(Color.WHITE);
@@ -104,12 +105,10 @@ public class Game {
 
         playingRoot.getChildren().addAll(background, displayScore, scoreJ1, scoreJ2, chrono, powerJ1,powerJ2,hidePowerJ1,hidePowerJ2);
 
-        Player j1 = new Player(100,500,"j1","src/main/resources/images/perso1d.png", "src/main/resources/images/perso1g.png",playingRoot);
-        j1.setControl(KeyCode.Q, KeyCode.D, KeyCode.SPACE, KeyCode.SHIFT);
+        Player j1 = new Player(100,500,nameJ1,"src/main/resources/images/perso1d.png", "src/main/resources/images/perso1g.png",playingRoot);
         j1.setActualTexture(j1.getRightTexture());
 
-        Player j2 = new Player(900,500,"j2","src/main/resources/images/perso2d.png", "src/main/resources/images/perso2g.png",playingRoot);
-        j2.setControl(KeyCode.LEFT,KeyCode.RIGHT,KeyCode.UP,KeyCode.NUMPAD0);
+        Player j2 = new Player(900,500,nameJ2,"src/main/resources/images/perso2d.png", "src/main/resources/images/perso2g.png",playingRoot);
         j2.setActualTexture(j2.getLeftTexture());
 
         Ball ball = new Ball(480,400,"src/main/resources/images/ball.png",playingRoot);
@@ -117,48 +116,56 @@ public class Game {
         final Set<KeyCode> activeKeys = EnumSet.noneOf(KeyCode.class);
 
         Random power = new Random();
+        AtomicBoolean gameChrono = new AtomicBoolean(false);
+        AtomicBoolean startChrono = new AtomicBoolean(true);
 
         //https://stackoverflow.com/questions/50337303/how-do-i-change-the-speed-of-an-animationtimer-in-javafx  --> timeline
         //https://www.developpez.net/forums/d1677438/java/interfaces-graphiques-java/javafx/setonkeypressed-multiple-touches/  --> multiple key pressed
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(10), actionEvent -> {
-            if (msToS.get() == 0){
-                msToS.set(1000);
-                seconde.addAndGet(-1);
-                if (seconde.get() < 0){
-                    seconde.set(59);
-                    minute.addAndGet(-1);
-                }
-                chrono.setText(minute.get() + ":" + seconde.get());
-
-                if (!j1.isHasPower()){
-                    playingRoot.getChildren().removeAll(fullPowerJ1,imagePowerJ1);
-                    hidePowerJ1.setWidth(hidePowerJ1.getWidth() - 15);
-                    j1.decrementTimePower();
-                    if (j1.getTimePower() == 0){
-                        j1.setHasPower(true);
-                        try {
-                            choosePower(power.nextInt(4),j1,ball,885,350,j2,imagePowerJ1);
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        }
-                        playingRoot.getChildren().addAll(fullPowerJ1,imagePowerJ1);
+            if (startChrono.get()){
+                startChrono.set(false);
+                chrono(playingRoot, j1, j2, ball,gameChrono, msToS);
+            }
+            if (gameChrono.get()) {
+                if (msToS.get() == 0) {
+                    msToS.set(1000);
+                    seconde.addAndGet(-1);
+                    if (seconde.get() < 0) {
+                        seconde.set(59);
+                        minute.addAndGet(-1);
                     }
-                }
+                    chrono.setText(minute.get() + ":" + (seconde.get() < 10 ? "0" + seconde.get() : seconde.get()));
 
-
-                if (!j2.isHasPower()){
-                    playingRoot.getChildren().removeAll(fullPowerJ2,imagePowerJ2);
-                    hidePowerJ2.setWidth(hidePowerJ2.getWidth() - 15);
-                    hidePowerJ2.setX(hidePowerJ2.getX() + 15);
-                    j2.decrementTimePower();
-                    if (j2.getTimePower() == 0) {
-                        j2.setHasPower(true);
-                        try {
-                            choosePower(power.nextInt(4),j2,ball,30,350,j1,imagePowerJ2);
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
+                    if (!j1.isHasPower()) {
+                        playingRoot.getChildren().removeAll(fullPowerJ1, imagePowerJ1);
+                        hidePowerJ1.setWidth(hidePowerJ1.getWidth() - 15);
+                        j1.decrementTimePower();
+                        if (j1.getTimePower() == 0) {
+                            j1.setHasPower(true);
+                            try {
+                                choosePower(power.nextInt(4), j1, ball, 885, 350, j2, imagePowerJ1);
+                            } catch (FileNotFoundException e) {
+                                e.printStackTrace();
+                            }
+                            playingRoot.getChildren().addAll(fullPowerJ1, imagePowerJ1);
                         }
-                        playingRoot.getChildren().addAll(fullPowerJ2,imagePowerJ2);
+                    }
+
+
+                    if (!j2.isHasPower()) {
+                        playingRoot.getChildren().removeAll(fullPowerJ2, imagePowerJ2);
+                        hidePowerJ2.setWidth(hidePowerJ2.getWidth() - 15);
+                        hidePowerJ2.setX(hidePowerJ2.getX() + 15);
+                        j2.decrementTimePower();
+                        if (j2.getTimePower() == 0) {
+                            j2.setHasPower(true);
+                            try {
+                                choosePower(power.nextInt(4), j2, ball, 30, 350, j1, imagePowerJ2);
+                            } catch (FileNotFoundException e) {
+                                e.printStackTrace();
+                            }
+                            playingRoot.getChildren().addAll(fullPowerJ2, imagePowerJ2);
+                        }
                     }
                 }
             }
@@ -166,12 +173,14 @@ public class Game {
             for (KeyCode keyCode: activeKeys){
                 j1.move(keyCode);
                 if (j1.isHasPower() && j1.getControl().get("power") == keyCode){
+                    j1.setHasPower(false);
                     hidePowerJ1.setWidth(150);
                 }
                 j2.move(keyCode);
                 if (j2.isHasPower() && j2.getControl().get("power") == keyCode){
+                    j2.setHasPower(false);
                     hidePowerJ2.setWidth(150);
-                    hidePowerJ2.setX(625);
+                    hidePowerJ2.setX(675);
                 }
             }
 
@@ -190,15 +199,19 @@ public class Game {
             if (ball.checkBasket(leftBasket)) {
                     j2.incrementScore();
                     scoreJ2.setText(String.valueOf(j2.getScore()));
-                    reset(ball, j1, j2);
-                    playingRoot.getChildren().removeAll(imagePowerJ1,imagePowerJ2);
+                    reset(ball, j1, j2, hidePowerJ1, hidePowerJ2);
+                    playingRoot.getChildren().removeAll(imagePowerJ1,imagePowerJ2, fullPowerJ1, fullPowerJ2);
+                    startChrono.set(true);
+                    gameChrono.set(false);
             }
 
             if (ball.checkBasket(rightBasket)){
                 j1.incrementScore();
                 scoreJ1.setText(String.valueOf(j1.getScore()));
-                reset(ball, j1, j2);
-                playingRoot.getChildren().removeAll(imagePowerJ1,imagePowerJ2);
+                reset(ball, j1, j2, hidePowerJ1, hidePowerJ2);
+                playingRoot.getChildren().removeAll(imagePowerJ1,imagePowerJ2, fullPowerJ1, fullPowerJ2);
+                startChrono.set(true);
+                gameChrono.set(false);
             }
 
             msToS.addAndGet(-10);
@@ -220,17 +233,19 @@ public class Game {
         playingStage.show();
     }
 
-    private static void reset(Ball ball, Player j1, Player j2) {
+    private static void reset(Ball ball, Player j1, Player j2, Rectangle hidePowerJ1, Rectangle hidePowerJ2) {
         ball.reset();
         j1.reset(100,500);
         j2.reset(900,500);
+        hidePowerJ1.setWidth(150);
+        hidePowerJ2.setWidth(150);
+        hidePowerJ2.setX(675);
         j1.setActualTexture(j1.getRightTexture());
         j2.setActualTexture(j2.getLeftTexture());
     }
 
     private static void choosePower(int number, Player player, Ball ball, int x, int y, Player affectPlayer, ImageView imagePower) throws FileNotFoundException {
-        System.out.println(number);
-        switch (number%4){
+        switch (number){
             case 0 -> {
                 player.setPower(new FreezeBall(ball));
                 imagePower.setImage(new Image(new FileInputStream("src/main/resources/images/freeze_ball.png")));
@@ -248,5 +263,30 @@ public class Game {
                 imagePower.setImage(new Image(new FileInputStream("src/main/resources/images/inverse_commande.png")));
             }
         }
+    }
+
+    private static void chrono(Group root, Player j1, Player j2, Ball ball, AtomicBoolean gameChrono, AtomicInteger msToS){
+        AtomicInteger timer = new AtomicInteger(3);
+        Label chrono = new Label(String.valueOf(timer.get()));
+        chrono.setLayoutX(500);
+        chrono.setLayoutY(250);
+        chrono.setTextFill(Color.WHITE);
+        root.getChildren().addAll(chrono);
+        ball.setSpeed(0);
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), actionEvent -> {
+            timer.addAndGet(-1);
+            if (timer.get() == 0){
+                j1.setControl(KeyCode.Q, KeyCode.D, KeyCode.SPACE, KeyCode.SHIFT);
+                j2.setControl(KeyCode.LEFT,KeyCode.RIGHT,KeyCode.UP,KeyCode.NUMPAD0);
+                ball.setSpeed(1);
+                root.getChildren().removeAll(chrono);
+                gameChrono.set(true);
+                msToS.set(1000);
+            }
+            chrono.setText(String.valueOf(timer.get()));
+        }));
+
+        timeline.setCycleCount(3);
+        timeline.play();
     }
 }

@@ -1,7 +1,6 @@
 package basket_baaallll.code_java.entities;
 
 import basket_baaallll.code_java.Power.Power;
-import basket_baaallll.code_java.entities.Entities;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -16,7 +15,7 @@ import java.util.HashMap;
 public class Player implements Entities {
     private int x;
     private int y;
-    private boolean hasJump = false;
+    private boolean hasJump = true;
     private Power power;
 
     private HashMap<String, KeyCode> control = new HashMap<>();
@@ -146,12 +145,12 @@ public class Player implements Entities {
 
     public void usePower(){
         if (hasPower){
-            hasPower = false;
             timePower = 10;
             power.use();
         }
-
     }
+
+
 
     public void update(){
         name.setLayoutX(x);
@@ -176,5 +175,7 @@ public class Player implements Entities {
         hasPower = false;
         hasJump = false;
         power = null;
+        timePower = 10;
+        setControl(null,null,null,null);
     }
 }
