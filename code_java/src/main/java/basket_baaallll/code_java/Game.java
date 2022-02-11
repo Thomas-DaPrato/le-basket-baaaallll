@@ -21,6 +21,8 @@ import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import javax.print.attribute.standard.Media;
+import java.awt.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.EnumSet;
@@ -29,10 +31,17 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+
+
+
+
+
 public class Game {
     public static void start(String nameJ1, String nameJ2) throws FileNotFoundException {
 
         Stage playingStage = new Stage();
+
+
 
         Group playingRoot = new Group();
         Scene playingScene = new Scene(playingRoot,1000,700);
