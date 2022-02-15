@@ -15,20 +15,23 @@ import java.util.HashMap;
 public class Player implements Entities {
     private int x;
     private int y;
+
     private boolean hasJump = true;
+    private boolean endOfJump = true;
+
     private Power power;
 
     private HashMap<String, KeyCode> control = new HashMap<>();
 
-    private Label name;
+    private final Label name;
     private int score = 0;
 
     private int timePower = 10;
     private boolean hasPower = false;
 
-    private ImageView actualTexture = new ImageView();
-    private Image rightTexture;
-    private Image leftTexture;
+    private final ImageView actualTexture = new ImageView();
+    private final Image rightTexture;
+    private final Image leftTexture;
     private Rectangle hitbox;
 
     public Player(int x, int y, String name, String pathRightTexture, String pathLeftTexture, Group root) throws FileNotFoundException {
@@ -121,15 +124,25 @@ public class Player implements Entities {
         }
         if(control.get("jump") == key){
             if (!hasJump) {
-                y -= 100;
                 hasJump = true;
+                endOfJump = false;
             }
         }
 
         if(control.get("power") == key){
             usePower();
         }
-        update();
+    }
+
+    public void jump(){
+        if (hasJump){
+            if (!endOfJump && y > 700 - getRightTexture().getHeight() - 100)
+                y -=5;
+            else {
+                endOfJump = true;
+                gravity();
+            }
+        }
     }
 
     public void gravity(){
@@ -139,7 +152,6 @@ public class Player implements Entities {
         else {
             hasJump = false;
         }
-        update();
     }
 
 
@@ -153,6 +165,7 @@ public class Player implements Entities {
 
 
     public void update(){
+        jump();
         name.setLayoutX(x);
         name.setLayoutY(y - 25);
         actualTexture.setX(x);
@@ -173,7 +186,8 @@ public class Player implements Entities {
         this.x = x;
         this.y = y;
         hasPower = false;
-        hasJump = false;
+        hasJump = true;
+        endOfJump = true;
         power = null;
         timePower = 10;
         setControl(null,null,null,null);

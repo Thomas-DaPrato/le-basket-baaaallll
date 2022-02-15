@@ -21,8 +21,8 @@ import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import javax.print.attribute.standard.Media;
-import java.awt.*;
+import javax.sound.sampled.*;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.EnumSet;
@@ -32,16 +32,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
-
-
-
-
 public class Game {
-    public static void start(String nameJ1, String nameJ2) throws FileNotFoundException {
+    public static void start(String nameJ1, String nameJ2) throws Exception {
 
         Stage playingStage = new Stage();
-
-
 
         Group playingRoot = new Group();
         Scene playingScene = new Scene(playingRoot,1000,700);
@@ -74,7 +68,7 @@ public class Game {
         scoreJ2.setLayoutY(100);
         scoreJ2.setTextFill(Color.WHITE);
 
-        AtomicInteger minute = new AtomicInteger(5);
+        AtomicInteger minute = new AtomicInteger(1);
         AtomicInteger seconde = new AtomicInteger(0);
         AtomicInteger msToS = new AtomicInteger(0);
 
@@ -114,6 +108,7 @@ public class Game {
 
         playingRoot.getChildren().addAll(background, displayScore, scoreJ1, scoreJ2, chrono, powerJ1,powerJ2,hidePowerJ1,hidePowerJ2);
 
+        //build entities
         Player j1 = new Player(100,500,nameJ1,"src/main/resources/images/perso1d.png", "src/main/resources/images/perso1g.png",playingRoot);
         j1.setActualTexture(j1.getRightTexture());
 
@@ -123,6 +118,12 @@ public class Game {
         Ball ball = new Ball(480,400,"src/main/resources/images/ball.png",playingRoot);
 
         final Set<KeyCode> activeKeys = EnumSet.noneOf(KeyCode.class);
+
+        //build sound game
+        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File("src/main/resources/musiques/music_jeu.wav"));
+        Clip clip = AudioSystem.getClip();
+        clip.open(audioInputStream);
+        clip.loop(Clip.LOOP_CONTINUOUSLY);
 
         Random power = new Random();
         AtomicBoolean gameChrono = new AtomicBoolean(false);
@@ -142,6 +143,14 @@ public class Game {
                     if (seconde.get() < 0) {
                         seconde.set(59);
                         minute.addAndGet(-1);
+                        if (minute.get() < 0){
+                            try {
+                                endGame(j1,j2,playingRoot);
+                            } catch (FileNotFoundException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
                     }
                     chrono.setText(minute.get() + ":" + (seconde.get() < 10 ? "0" + seconde.get() : seconde.get()));
 
@@ -193,8 +202,8 @@ public class Game {
                 }
             }
 
-            j1.gravity();
-            j2.gravity();
+            j1.update();
+            j2.update();
 
             ball.move();
 
@@ -297,5 +306,34 @@ public class Game {
 
         timeline.setCycleCount(3);
         timeline.play();
+    }
+
+    private static void endGame(Player j1, Player j2, Group root) throws FileNotFoundException {
+        if (j1.getScore() > j2.getScore()){
+            j1.reset(425, 178);
+            j2.reset(586, 250);
+            ImageView podium = new ImageView(new Image(new FileInputStream("src/main/resources/images/podium.png")));
+            podium.setX(0);
+            podium.setY(200);
+            root.getChildren().add(podium);
+        }
+        else if (j1.getScore() < j2.getScore()){
+            j1.reset(586, 250);
+            j2.reset(425, 178);
+            ImageView podium = new ImageView(new Image(new FileInputStream("src/main/resources/images/podium.png")));
+            podium.setX(0);
+            podium.setY(200);
+            root.getChildren().add(podium);
+        }
+        else {
+            j1.reset(420, 180);
+            j2.reset(520, 180);
+            ImageView podium = new ImageView(new Image(new FileInputStream("src/main/resources/images/podium_egalite.png")));
+            podium.setX(0);
+            podium.setY(200);
+            root.getChildren().add(podium);
+        }
+
+
     }
 }

@@ -1,0 +1,10 @@
+#play {
+    -fx-background-color: orange;
+    -fx-text-fill: white;
+    -fx-pref-width: 150 px;
+    -fx-pref-height: 50 px;
+}
+
+#play:hover {
+    -fx-text-fill: blue;
+}

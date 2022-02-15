@@ -18,5 +18,6 @@ public class TpBall extends PowerBall {
     public void use() {
         ball.setX(x);
         ball.setY(y);
+        ball.setyDirection(1);
     }
 }
